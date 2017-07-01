@@ -3,6 +3,7 @@
 export class ServiceApiOptions {
   constructor(
     public domain: string,
-    public apiPath: string
+    public apiPath: string,
+    public port?: number
   ) {}
 }
