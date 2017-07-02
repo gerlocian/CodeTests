@@ -5,6 +5,17 @@ import { Response } from '@angular/http';
 import { LillyCoiService } from "./lilly-coi.service";
 import { Trial, TrialDate } from './trial.type';
 
+export enum SortOrder {
+  ASCENDING,
+  DESCENDING
+}
+
+export enum SortBy {
+  BRIEF_TITLE,
+  LEAD_SPONSOR,
+  COMPLETION_DATE
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -16,6 +27,8 @@ export class AppComponent implements OnInit{
   private totalPages: number;
   private currentSet: Array<object>;
   private numResults: number = 10;
+  private sortOrder: SortOrder = SortOrder.ASCENDING;
+  private sortBy: SortBy.BRIEF_TITLE;
 
   constructor(
     private lillyCoiService: LillyCoiService
@@ -32,32 +45,74 @@ export class AppComponent implements OnInit{
     this.processCurrentSet();
   }
 
-  sortByBriefTitle() {
-    this.lillyCoiData.sort((trialA: Trial, trialB: Trial) => {
-      let a = trialA.brief_title.toUpperCase();
-      let b = trialB.brief_title.toUpperCase();
+  isSortingAscending() { return this.sortOrder as SortOrder === SortOrder.ASCENDING; }
+  isSortingDescending() { return this.sortOrder as SortOrder === SortOrder.DESCENDING; }
 
-      if (a < b) return -1;
-      if (a > b) return 1;
-      return 0;
-    });
+  isSortingByBriefTitle() { return this.sortBy as SortBy === SortBy.BRIEF_TITLE; }
+  isSortingByLeadSponsor() { return this.sortBy as SortBy === SortBy.LEAD_SPONSOR; }
+  isSortingByCompletionDate() { return this.sortBy as SortBy === SortBy.COMPLETION_DATE; }
+
+  determineSortSettings(requestedSortBy) {
+    if (this.sortBy !== requestedSortBy) {
+      this.sortBy = requestedSortBy;
+      this.sortOrder = SortOrder.ASCENDING;
+    } else {
+      if (this.sortOrder === SortOrder.ASCENDING) this.sortOrder = SortOrder.DESCENDING;
+      else this.sortOrder = SortOrder.ASCENDING;
+    }
+  }
+
+  compareValues(a: any, b: any): number {
+    if (a < b) return this.sortOrder === SortOrder.ASCENDING ? -1 : 1;
+    if (a > b) return this.sortOrder === SortOrder.ASCENDING ? 1 : -1;
+    return 0;
+  }
+
+  sortByAlphabet(field: string, trialA: Trial, trialB: Trial) {
+    let a = trialA[field].toUpperCase();
+    let b = trialB[field].toUpperCase();
+
+    return this.compareValues(a, b);
+  }
+
+  sortByBriefTitle() {
+    this.determineSortSettings(SortBy.BRIEF_TITLE);
+
+    this.lillyCoiData.sort(this.sortByAlphabet.bind(this, 'brief_title'));
     this.processCurrentSet();
   }
 
   sortByLeadSponsor() {
-    this.lillyCoiData.sort((trialA: Trial, trialB: Trial) => {
-      let a = trialA.lead_sponsor.toUpperCase();
-      let b = trialB.lead_sponsor.toUpperCase();
+    this.determineSortSettings(SortBy.LEAD_SPONSOR);
+    console.log(this.sortBy, this.sortOrder);
 
-      if (a < b) return -1;
-      if (a > b) return 1;
-      return 0;
+    this.lillyCoiData.sort((trialA: Trial, trialB: Trial) => {
+      let result = this.sortByAlphabet('lead_sponsor', trialA, trialB);
+
+      if (result === 0) {
+        return this.sortByAlphabet('brief_title', trialA, trialB);
+      }
+
+      return result;
     });
     this.processCurrentSet();
   }
 
   sortByCompletionDate() {
-    this.lillyCoiData.sort((trialA: Trial, trialB: Trial) => trialA.completion_date.date - trialB.completion_date.date);
+    this.determineSortSettings(SortBy.COMPLETION_DATE);
+
+    this.lillyCoiData.sort((trialA: Trial, trialB: Trial) => {
+      let a = trialA.completion_date.date;
+      let b = trialB.completion_date.date;
+
+      let result = this.compareValues(a, b);
+
+      if (result === 0) {
+        return this.sortByAlphabet('brief_title', trialA, trialB);
+      }
+
+      return result;
+    });
     this.processCurrentSet();
   }
 

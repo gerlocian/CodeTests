@@ -15,6 +15,19 @@
 
 .data-table th {
   background-color: #cccccc;
+  text-align: left;
+}
+
+.data-table th#brief-title-heading {
+  width: 50%;
+}
+
+.data-table th#lead-sponsor-heading {
+  width: 35%;
+}
+
+.data-table th#completion-date-heading {
+  width: 20%;
 }
 
 .data-table th button {
@@ -32,3 +45,12 @@
   margin-top: 10px;
   text-align: center;
 }
+
+.data-table .sorting.ascending::after {
+  content: '\2191';
+}
+
+.data-table .sorting.descending::after {
+  content: '\2193';
+}
+

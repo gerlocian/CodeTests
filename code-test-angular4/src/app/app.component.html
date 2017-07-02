@@ -1,9 +1,39 @@
 <table class="data-table" cellpadding="0" cellspacing="0">
   <thead>
     <tr>
-      <th><button (click)="sortByBriefTitle()" id="sort-by-brief-title-button">Brief Title</button></th>
-      <th><button (click)="sortByLeadSponsor()" id="sort-by-lead-sponsor-button">Lead Sponsor</button></th>
-      <th><button (click)="sortByCompletionDate()" id="sort-by-completion-date-button">Completion Date</button></th>
+      <th id="brief-title-heading">
+        <button (click)="sortByBriefTitle()"
+                [ngClass]="{
+                  sorting: isSortingByBriefTitle() && (isSortingAscending() || isSortingDescending()),
+                  ascending: isSortingByBriefTitle() && isSortingAscending(),
+                  descending: isSortingByBriefTitle() && isSortingDescending()
+                }"
+                id="sort-by-brief-title-button">
+          Brief Title
+        </button>
+      </th>
+      <th id="lead-sponsor-heading">
+        <button (click)="sortByLeadSponsor()"
+                [ngClass]="{
+                  sorting: isSortingByLeadSponsor() && (isSortingAscending() || isSortingDescending()),
+                  ascending: isSortingByLeadSponsor() && isSortingAscending(),
+                  descending: isSortingByLeadSponsor() && isSortingDescending()
+                }"
+                id="sort-by-lead-sponsor-button">
+          Lead Sponsor
+        </button>
+      </th>
+      <th id="completion-date-heading">
+        <button (click)="sortByCompletionDate()"
+                [ngClass]="{
+                  sorting: isSortingByCompletionDate() && (isSortingAscending() || isSortingDescending()),
+                  ascending: isSortingByCompletionDate() && isSortingAscending(),
+                  descending: isSortingByCompletionDate() && isSortingDescending()
+                }"
+                id="sort-by-completion-date-button">
+          Completion Date
+        </button>
+      </th>
     </tr>
   </thead>
   <tbody>
